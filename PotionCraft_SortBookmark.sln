@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotionCraft_SortBookmark", "PotionCraft_SortBookmark\PotionCraft_SortBookmark.csproj", "{4AB98E6C-8FC4-4DEF-B012-4E647E0812FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AB98E6C-8FC4-4DEF-B012-4E647E0812FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB98E6C-8FC4-4DEF-B012-4E647E0812FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB98E6C-8FC4-4DEF-B012-4E647E0812FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AB98E6C-8FC4-4DEF-B012-4E647E0812FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4348A177-AE9C-470B-A33C-FAB2507BCED3}
+	EndGlobalSection
+EndGlobal
