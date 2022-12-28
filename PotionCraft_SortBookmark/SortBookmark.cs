@@ -8,7 +8,7 @@ using PotionCraft.ScriptableObjects.Potion;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.0.0")]
+    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.1.0")]
     public class SortBookmark : BaseUnityPlugin
     {
         private ConfigEntry<KeyCode> hotkey;
@@ -34,8 +34,10 @@ namespace xiaoye97
             var recipeBook = Managers.Potion.recipeBook;
             var groupCtl = recipeBook.bookmarkControllersGroupController;
             var markCtl = groupCtl.controllers[0].bookmarkController;
-            var marks = groupCtl.GetAllBookmarksList();
+
+            // 所有书签
             List<PotionAndBookmark> all = new List<PotionAndBookmark>();
+            var marks = groupCtl.GetAllBookmarksList();
             for (int i = 0; i < marks.Count; i++)
             {
                 PotionAndBookmark pb = new PotionAndBookmark();
@@ -47,31 +49,38 @@ namespace xiaoye97
                 }
                 all.Add(pb);
             }
-            // 排序
-            SortFunc1(all);
-            // 将合成书的书页按新的排放
-            recipeBook.savedRecipes.Clear();
+            // 挑出需要排序的书签
+            List<PotionAndBookmark> sortPbs = new List<PotionAndBookmark>();
             foreach (var pb in all)
             {
-                if (pb.IsEmpty)
+                // 如果不为空并且不跳过，则加到列表
+                if (!pb.IsEmpty && !pb.Potion.customDescription.StartsWith("skip"))
                 {
-                    recipeBook.savedRecipes.Add(null);
-                }
-                else
-                {
-                    recipeBook.savedRecipes.Add(pb.Potion);
+                    sortPbs.Add(pb);
                 }
             }
+            // 挑出空书签
+            List<PotionAndBookmark> emptyPbs = new List<PotionAndBookmark>();
+            foreach (var pb in all)
+            {
+                // 如果为空，则加到列表
+                if (pb.IsEmpty)
+                {
+                    emptyPbs.Add(pb);
+                }
+            }
+            // 排序
+            SortRailBookmark(sortPbs);
 
-            Debug.Log($"共有{marks.Count}个书签");
+            Debug.Log($"共有{all.Count}个书签，其中{sortPbs.Count}个有内容书签需要整理，{emptyPbs.Count}个空书签");
             int index = 0;
-            // 一轨一轨的循环
+            // 一轨一轨的循环放置书签
             foreach (var rail in markCtl.rails)
             {
                 float usedX = 0;
-                while (all.Count > 0)
+                while (sortPbs.Count > 0)
                 {
-                    var pb = all[0];
+                    var pb = sortPbs[0];
                     var mark = pb.Bookmark;
                     var markSize = mark.GetBookMarkSize();
                     // 如果已使用的空间+新的书签的空间大于轨道空间，则切换到下一个轨道
@@ -91,27 +100,60 @@ namespace xiaoye97
                         rail.Connect(mark, pos);
                         usedX += markSize.x;
                     }
-                    all.RemoveAt(0);
+                    sortPbs.RemoveAt(0);
                     index++;
                 }
             }
-            // 如果有多余的书签，则堆放到最后一个轨道
-            if (all.Count > 0)
+
+            var lastRail = markCtl.rails[markCtl.rails.Count - 1];
+            // 如果有多余的书签，一起堆放到最后一个轨道
+            if (sortPbs.Count > 0)
             {
-                var lastRail = markCtl.rails[markCtl.rails.Count - 1];
-                foreach (var pb in all)
+                int stackIndex = 0;
+                foreach (var pb in sortPbs)
+                {
+                    lastRail.Connect(pb.Bookmark, new Vector2(stackIndex * 0.01f, (stackIndex % 10) / 10f));
+                    stackIndex++;
+                }
+                Debug.Log($"将{sortPbs.Count}个书签堆放在了最后一个轨道");
+            }
+            // 将空书签堆放到最后一个轨道的后方
+            if (emptyPbs.Count > 0)
+            {
+                foreach (var pb in emptyPbs)
                 {
                     lastRail.Connect(pb.Bookmark, new Vector2(1, 1));
                 }
-                Debug.Log($"将{all.Count}个书签堆放在了最后一个轨道");
+                Debug.Log($"将{emptyPbs.Count}个空书签堆放在了最后一个轨道");
+            }
+
+            // 书签排序完毕，重新排序书页
+            // 从此时的轨道中，依次取出书签对应的书页，由于rail在连接时会自动重排，所以直接添加即可
+            recipeBook.savedRecipes.Clear();
+            foreach (var rail in markCtl.rails)
+            {
+                foreach (var bookmark in rail.railBookmarks)
+                {
+                    // 查找对应的页面
+                    for (int i = all.Count - 1; i >= 0; i--)
+                    {
+                        // 找到了
+                        if (all[i].Bookmark == bookmark)
+                        {
+                            recipeBook.savedRecipes.Add(all[i].Potion);
+                            all.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// 第一种排序方式
+        /// 排序轨道上的书签
         /// </summary>
         /// <param name="all"></param>
-        public void SortFunc1(List<PotionAndBookmark> all)
+        public void SortRailBookmark(List<PotionAndBookmark> all)
         {
             all.Sort((a, b) =>
             {
