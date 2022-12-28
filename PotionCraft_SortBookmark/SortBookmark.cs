@@ -8,10 +8,19 @@ using PotionCraft.ScriptableObjects.Potion;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.1.0")]
+    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.2.0")]
     public class SortBookmark : BaseUnityPlugin
     {
         private ConfigEntry<KeyCode> hotkey;
+        private static List<string> oriRailNames = new List<string>()
+        {
+            "LeftToRight1",
+            "LeftToRight2",
+            "TopToBottom1",
+            "RightToLeft1",
+            "RightToLeft2",
+            "BottomToTop1"
+        };
 
         private void Start()
         {
@@ -53,8 +62,8 @@ namespace xiaoye97
             List<PotionAndBookmark> sortPbs = new List<PotionAndBookmark>();
             foreach (var pb in all)
             {
-                // 如果不为空并且不跳过，则加到列表
-                if (!pb.IsEmpty && !pb.Potion.customDescription.StartsWith("skip"))
+                // 如果不为空并且不跳过并且rail是原版的rail，则加到列表
+                if (!pb.IsEmpty && !pb.Potion.customDescription.StartsWith("skip") && oriRailNames.Contains(pb.Bookmark.rail.name))
                 {
                     sortPbs.Add(pb);
                 }
@@ -77,6 +86,11 @@ namespace xiaoye97
             // 一轨一轨的循环放置书签
             foreach (var rail in markCtl.rails)
             {
+                // 如果不是原版的rail，则跳过
+                if (!oriRailNames.Contains(rail.name))
+                {
+                    continue;
+                }
                 float usedX = 0;
                 while (sortPbs.Count > 0)
                 {
@@ -105,7 +119,7 @@ namespace xiaoye97
                 }
             }
 
-            var lastRail = markCtl.rails[markCtl.rails.Count - 1];
+            var lastRail = markCtl.rails.Find(r => r.name == "BottomToTop1");
             // 如果有多余的书签，一起堆放到最后一个轨道
             if (sortPbs.Count > 0)
             {
