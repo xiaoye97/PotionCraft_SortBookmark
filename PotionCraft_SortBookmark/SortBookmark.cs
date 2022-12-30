@@ -46,7 +46,14 @@ namespace xiaoye97
 
             // 所有书签
             List<PotionAndBookmark> all = new List<PotionAndBookmark>();
-            var marks = groupCtl.GetAllBookmarksList();
+
+            // Get a list of all bookmarks before sort for use later
+            var preSortBookmarkList = groupCtl.GetAllBookmarksList();
+
+            // Get all bookmarks on the non-modded rails
+            var allRails = groupCtl.controllers[0].bookmarkController.rails;
+            var nonModdedRails = allRails.Take(6);
+            var marks = nonModdedRails.SelectMany(r => r.railBookmarks).ToList();
             for (int i = 0; i < marks.Count; i++)
             {
                 PotionAndBookmark pb = new PotionAndBookmark();
@@ -141,26 +148,32 @@ namespace xiaoye97
                 Debug.Log($"将{emptyPbs.Count}个空书签堆放在了最后一个轨道");
             }
 
+            // Trigger the bookmarks rearranged method to reorganize the savedRecipes list to match the new bookmark order
+            markCtl.CallOnBookmarksRearrangeIfNecessary(preSortBookmarkList);
+
+
             // 书签排序完毕，重新排序书页
             // 从此时的轨道中，依次取出书签对应的书页，由于rail在连接时会自动重排，所以直接添加即可
-            recipeBook.savedRecipes.Clear();
-            foreach (var rail in markCtl.rails)
-            {
-                foreach (var bookmark in rail.railBookmarks)
-                {
-                    // 查找对应的页面
-                    for (int i = all.Count - 1; i >= 0; i--)
-                    {
-                        // 找到了
-                        if (all[i].Bookmark == bookmark)
-                        {
-                            recipeBook.savedRecipes.Add(all[i].Potion);
-                            all.RemoveAt(i);
-                            break;
-                        }
-                    }
-                }
-            }
+
+            // This code is no longer nessesary
+            //recipeBook.savedRecipes.Clear();
+            //foreach (var rail in markCtl.rails)
+            //{
+            //    foreach (var bookmark in rail.railBookmarks)
+            //    {
+            //        // 查找对应的页面
+            //        for (int i = all.Count - 1; i >= 0; i--)
+            //        {
+            //            // 找到了
+            //            if (all[i].Bookmark == bookmark)
+            //            {
+            //                recipeBook.savedRecipes.Add(all[i].Potion);
+            //                all.RemoveAt(i);
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
