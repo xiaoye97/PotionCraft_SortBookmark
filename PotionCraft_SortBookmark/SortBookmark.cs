@@ -8,7 +8,7 @@ using PotionCraft.ScriptableObjects.Potion;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.2.0")]
+    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.3.0")]
     public class SortBookmark : BaseUnityPlugin
     {
         private ConfigEntry<KeyCode> hotkey;
