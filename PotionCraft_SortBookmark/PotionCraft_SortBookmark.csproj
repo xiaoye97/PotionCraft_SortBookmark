@@ -40,6 +40,10 @@
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Potion Craft\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PotionCraft.InputSystem">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Potion Craft\Potion Craft_Data\Managed\PotionCraft.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PotionCraft.Scripts-nstrip">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Potion Craft\NStrip\PotionCraft.Scripts-nstrip.dll</HintPath>
       <Private>False</Private>
@@ -69,6 +73,7 @@
     <Compile Include="PotionAndBookmark.cs" />
     <Compile Include="SortBookmark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SortBookmarkPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

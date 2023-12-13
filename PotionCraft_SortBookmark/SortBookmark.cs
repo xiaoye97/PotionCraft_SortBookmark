@@ -1,17 +1,17 @@
 ﻿using BepInEx;
 using System.Linq;
 using UnityEngine;
-using BepInEx.Configuration;
 using PotionCraft.ManagersSystem;
 using System.Collections.Generic;
 using PotionCraft.ScriptableObjects.Potion;
+using PotionCraft.InputSystem;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.3.0")]
-    public class SortBookmark : BaseUnityPlugin
+    public class SortBookmark : MonoBehaviour
     {
-        private ConfigEntry<KeyCode> hotkey;
+        private Button hotkeyButton;
+
         private static List<string> oriRailNames = new List<string>()
         {
             "LeftToRight1",
@@ -22,15 +22,16 @@ namespace xiaoye97
             "BottomToTop1"
         };
 
-        private void Start()
+        private void Awake()
         {
-            hotkey = Config.Bind<KeyCode>("config", "SortHotkey", KeyCode.Space);
+            hotkeyButton = KeyboardKey.Get(SortBookmarkPlugin.Hotkey.Value);
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(hotkey.Value))
+            if (hotkeyButton.State == State.JustDowned)
             {
+                Debug.Log("按下了整理快捷键");
                 if (Managers.Potion.recipeBook.gameObject.activeInHierarchy)
                 {
                     SortAllBookmark();
@@ -150,7 +151,6 @@ namespace xiaoye97
 
             // Trigger the bookmarks rearranged method to reorganize the savedRecipes list to match the new bookmark order
             markCtl.CallOnBookmarksRearrangeIfNecessary(preSortBookmarkList);
-
 
             // 书签排序完毕，重新排序书页
             // 从此时的轨道中，依次取出书签对应的书页，由于rail在连接时会自动重排，所以直接添加即可
