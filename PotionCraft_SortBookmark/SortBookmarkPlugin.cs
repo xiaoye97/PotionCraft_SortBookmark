@@ -2,17 +2,12 @@
 using BepInEx.Configuration;
 using HarmonyLib;
 using PotionCraft.ManagersSystem;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PotionCraft.ObjectBased.UIElements.Books.RecipeBook;
 using UnityEngine;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "1.4.0")]
+    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "2.0.0")]
     public class SortBookmarkPlugin : BaseUnityPlugin
     {
         public static ConfigEntry<KeyCode> Hotkey;
@@ -23,8 +18,13 @@ namespace xiaoye97
             Harmony.CreateAndPatchAll(typeof(SortBookmarkPlugin));
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(Managers), "OnEnable")]
-        public static void Managers_OnEnable_Patch()
+        private void Update()
+        {
+
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(RecipeBook), "Awake")]
+        public static void RecipeBook_Awake_Patch()
         {
             GameObject pluginGameObject = new GameObject("SortBookmarkPlugin");
             pluginGameObject.AddComponent<SortBookmark>();

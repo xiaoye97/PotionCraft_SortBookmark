@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using System.Linq;
 using UnityEngine;
-using PotionCraft.ManagersSystem;
 using System.Collections.Generic;
 using PotionCraft.ScriptableObjects.Potion;
 using PotionCraft.InputSystem;
+using PotionCraft.ObjectBased.UIElements.Books.RecipeBook;
 
 namespace xiaoye97
 {
@@ -32,7 +32,7 @@ namespace xiaoye97
             if (hotkeyButton.State == State.JustDowned)
             {
                 Debug.Log("按下了整理快捷键");
-                if (Managers.Potion.recipeBook.gameObject.activeInHierarchy)
+                if (RecipeBook.Instance != null && RecipeBook.Instance.gameObject.activeInHierarchy)
                 {
                     SortAllBookmark();
                 }
@@ -41,8 +41,7 @@ namespace xiaoye97
 
         public void SortAllBookmark()
         {
-            var recipeBook = Managers.Potion.recipeBook;
-            var groupCtl = recipeBook.bookmarkControllersGroupController;
+            var groupCtl = RecipeBook.Instance.bookmarkControllersGroupController;
             var markCtl = groupCtl.controllers[0].bookmarkController;
 
             // 所有书签
@@ -59,10 +58,10 @@ namespace xiaoye97
             {
                 PotionAndBookmark pb = new PotionAndBookmark();
                 pb.Bookmark = marks[i];
-                pb.IsEmpty = recipeBook.IsEmptyPage(i);
+                pb.IsEmpty = RecipeBook.Instance.IsEmptyPage(i);
                 if (!pb.IsEmpty)
                 {
-                    pb.Potion = (Potion)recipeBook.GetPageContent(i);
+                    pb.Potion = (Potion)RecipeBook.Instance.GetPageContent(i);
                 }
                 all.Add(pb);
             }
@@ -71,7 +70,7 @@ namespace xiaoye97
             foreach (var pb in all)
             {
                 // 如果不为空并且不跳过并且rail是原版的rail，则加到列表
-                if (!pb.IsEmpty && !pb.Potion.customDescription.StartsWith("skip") && oriRailNames.Contains(pb.Bookmark.rail.name))
+                if (!pb.IsEmpty && !pb.Potion.CustomDescription.StartsWith("skip") && oriRailNames.Contains(pb.Bookmark.rail.name))
                 {
                     sortPbs.Add(pb);
                 }
