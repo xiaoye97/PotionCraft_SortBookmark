@@ -1,6 +1,6 @@
 # PotionCraft_SortBookmark
 
-This mod is Compatible with Potion Craft v1.1!
+This mod is Compatible with Potion Craft v2.0!
 
 Sort recipe book bookmark.
 
@@ -18,7 +18,7 @@ If you want a bookmark not to participate in sorting, you can start with skip in
 
 # 药剂工艺 书签排序
 
-此Mod适配药剂工艺v1.1版本！
+此Mod适配药剂工艺v2.0版本！
 
 功能: 整理配方书的书签。
 
