@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using PotionCraft.ScriptableObjects.Potion;
@@ -44,9 +43,6 @@ namespace xiaoye97
             var groupCtl = RecipeBook.Instance.bookmarkControllersGroupController;
             var markCtl = groupCtl.controllers[0].bookmarkController;
 
-            // 所有书签
-            List<PotionAndBookmark> all = new List<PotionAndBookmark>();
-
             // Get a list of all bookmarks before sort for use later
             var preSortBookmarkList = groupCtl.GetAllBookmarksList();
 
@@ -54,6 +50,8 @@ namespace xiaoye97
             var allRails = groupCtl.controllers[0].bookmarkController.rails;
             var nonModdedRails = allRails.Take(6);
             var marks = nonModdedRails.SelectMany(r => r.railBookmarks).ToList();
+            // 所有书签
+            List<PotionAndBookmark> all = new List<PotionAndBookmark>();
             for (int i = 0; i < marks.Count; i++)
             {
                 PotionAndBookmark pb = new PotionAndBookmark();
@@ -61,7 +59,12 @@ namespace xiaoye97
                 pb.IsEmpty = RecipeBook.Instance.IsEmptyPage(i);
                 if (!pb.IsEmpty)
                 {
-                    pb.Potion = (Potion)RecipeBook.Instance.GetPageContent(i);
+                    pb.Content = RecipeBook.Instance.GetPageContent(i);
+                    if (pb.Content is Potion)
+                    {
+                        pb.Potion = (Potion)pb.Content;
+                        pb.IsPotionMark = true;
+                    }
                 }
                 all.Add(pb);
             }
@@ -70,9 +73,19 @@ namespace xiaoye97
             foreach (var pb in all)
             {
                 // 如果不为空并且不跳过并且rail是原版的rail，则加到列表
-                if (!pb.IsEmpty && !pb.Potion.CustomDescription.StartsWith("skip") && oriRailNames.Contains(pb.Bookmark.rail.name))
+                if (!pb.IsEmpty && oriRailNames.Contains(pb.Bookmark.rail.name))
                 {
-                    sortPbs.Add(pb);
+                    if (pb.IsPotionMark)
+                    {
+                        if (!pb.Potion.CustomDescription.StartsWith("skip"))
+                        {
+                            sortPbs.Add(pb);
+                        }
+                    }
+                    else
+                    {
+                        sortPbs.Add(pb);
+                    }
                 }
             }
             // 挑出空书签
@@ -150,29 +163,6 @@ namespace xiaoye97
 
             // Trigger the bookmarks rearranged method to reorganize the savedRecipes list to match the new bookmark order
             markCtl.CallOnBookmarksRearrangeIfNecessary(preSortBookmarkList);
-
-            // 书签排序完毕，重新排序书页
-            // 从此时的轨道中，依次取出书签对应的书页，由于rail在连接时会自动重排，所以直接添加即可
-
-            // This code is no longer nessesary
-            //recipeBook.savedRecipes.Clear();
-            //foreach (var rail in markCtl.rails)
-            //{
-            //    foreach (var bookmark in rail.railBookmarks)
-            //    {
-            //        // 查找对应的页面
-            //        for (int i = all.Count - 1; i >= 0; i--)
-            //        {
-            //            // 找到了
-            //            if (all[i].Bookmark == bookmark)
-            //            {
-            //                recipeBook.savedRecipes.Add(all[i].Potion);
-            //                all.RemoveAt(i);
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
@@ -188,7 +178,7 @@ namespace xiaoye97
                 {
                     return 1;
                 }
-                if (b.IsEmpty && !a.IsEmpty)
+                if (!a.IsEmpty && b.IsEmpty)
                 {
                     return -1;
                 }
@@ -200,35 +190,46 @@ namespace xiaoye97
                 {
                     return hashA.CompareTo(hashB);
                 }
-
-                // 药水最高等级比较
-                int aMaxTier = a.Potion.GetMaxTier();
-                int bMaxTier = b.Potion.GetMaxTier();
-                if (aMaxTier != bMaxTier)
+                // 非药水比较
+                if (a.IsPotionMark && !b.IsPotionMark)
                 {
-                    return aMaxTier.CompareTo(bMaxTier);
+                    return 1;
                 }
-
-                // 药水总等级比较
-                int aAllTier = a.Potion.GetCollapsedEffects().Values.Sum();
-                int bAllTier = b.Potion.GetCollapsedEffects().Values.Sum();
-                if (aAllTier != bAllTier)
+                if (!a.IsPotionMark && b.IsPotionMark)
                 {
-                    return aAllTier.CompareTo(bAllTier);
+                    return -1;
                 }
-
-                // 药水价格比较
-                float aPrice = a.Potion.GetPrice();
-                float bPrice = b.Potion.GetPrice();
-                if (aPrice != bPrice)
+                if (a.IsPotionMark && b.IsPotionMark)
                 {
-                    return aPrice.CompareTo(bPrice);
-                }
+                    // 药水最高等级比较
+                    int aMaxTier = a.Potion.GetMaxTier();
+                    int bMaxTier = b.Potion.GetMaxTier();
+                    if (aMaxTier != bMaxTier)
+                    {
+                        return aMaxTier.CompareTo(bMaxTier);
+                    }
 
-                // 药水排序ID比较
-                if (a.Potion.sortingId != b.Potion.sortingId)
-                {
-                    return a.Potion.sortingId.CompareTo(b.Potion.sortingId);
+                    // 药水总等级比较
+                    int aAllTier = a.Potion.GetCollapsedEffects().Values.Sum();
+                    int bAllTier = b.Potion.GetCollapsedEffects().Values.Sum();
+                    if (aAllTier != bAllTier)
+                    {
+                        return aAllTier.CompareTo(bAllTier);
+                    }
+
+                    // 药水价格比较
+                    float aPrice = a.Potion.GetPrice();
+                    float bPrice = b.Potion.GetPrice();
+                    if (aPrice != bPrice)
+                    {
+                        return aPrice.CompareTo(bPrice);
+                    }
+
+                    // 药水排序ID比较
+                    if (a.Potion.sortingId != b.Potion.sortingId)
+                    {
+                        return a.Potion.sortingId.CompareTo(b.Potion.sortingId);
+                    }
                 }
 
                 return hashA.CompareTo(hashB);
