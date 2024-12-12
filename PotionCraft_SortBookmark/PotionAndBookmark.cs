@@ -13,5 +13,6 @@ namespace xiaoye97
         public Bookmark Bookmark;
         public bool IsEmpty;
         public bool IsPotionMark;
+        public string CustomDescription;
     }
 }

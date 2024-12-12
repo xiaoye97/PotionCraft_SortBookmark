@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using PotionCraft.ScriptableObjects.Potion;
 using PotionCraft.InputSystem;
 using PotionCraft.ObjectBased.UIElements.Books.RecipeBook;
+using PotionCraft.ScriptableObjects.AlchemyMachineProducts;
 
 namespace xiaoye97
 {
@@ -60,10 +61,15 @@ namespace xiaoye97
                 if (!pb.IsEmpty)
                 {
                     pb.Content = RecipeBook.Instance.GetPageContent(i);
-                    if (pb.Content is Potion)
+                    if (pb.Content is Potion potion)
                     {
-                        pb.Potion = (Potion)pb.Content;
+                        pb.Potion = potion;
+                        pb.CustomDescription = potion.CustomDescription;
                         pb.IsPotionMark = true;
+                    }
+                    else if (pb.Content is AlchemyMachineProduct amp)
+                    {
+                        pb.CustomDescription = amp.CustomDescription;
                     }
                 }
                 all.Add(pb);
@@ -75,14 +81,7 @@ namespace xiaoye97
                 // 如果不为空并且不跳过并且rail是原版的rail，则加到列表
                 if (!pb.IsEmpty && oriRailNames.Contains(pb.Bookmark.rail.name))
                 {
-                    if (pb.IsPotionMark)
-                    {
-                        if (!pb.Potion.CustomDescription.StartsWith("skip"))
-                        {
-                            sortPbs.Add(pb);
-                        }
-                    }
-                    else
+                    if (!string.IsNullOrWhiteSpace(pb.CustomDescription) && !pb.CustomDescription.StartsWith("skip"))
                     {
                         sortPbs.Add(pb);
                     }
