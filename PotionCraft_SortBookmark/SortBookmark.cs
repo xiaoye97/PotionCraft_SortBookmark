@@ -81,7 +81,8 @@ namespace xiaoye97
                 // 如果不为空并且不跳过并且rail是原版的rail，则加到列表
                 if (!pb.IsEmpty && oriRailNames.Contains(pb.Bookmark.rail.name))
                 {
-                    if (!string.IsNullOrWhiteSpace(pb.CustomDescription) && !pb.CustomDescription.StartsWith("skip"))
+                    // 跳过的书签不加入排序
+                    if (!pb.CustomDescription.StartsWith("skip"))
                     {
                         sortPbs.Add(pb);
                     }
