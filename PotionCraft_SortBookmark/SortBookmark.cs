@@ -1,10 +1,11 @@
-﻿using System.Linq;
-using UnityEngine;
-using System.Collections.Generic;
-using PotionCraft.ScriptableObjects.Potion;
-using PotionCraft.InputSystem;
+﻿using PotionCraft.InputSystem;
 using PotionCraft.ObjectBased.UIElements.Books.RecipeBook;
 using PotionCraft.ScriptableObjects.AlchemyMachineProducts;
+using PotionCraft.ScriptableObjects.Potion;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace xiaoye97
 {
@@ -165,6 +166,20 @@ namespace xiaoye97
             markCtl.CallOnBookmarksRearrangeIfNecessary(preSortBookmarkList);
         }
 
+        string orderPattern = @"^order:(\d+(?:\.\d+)?)";
+        public float GetOrder(PotionAndBookmark mark)
+        {
+            Match match = Regex.Match(mark.CustomDescription, orderPattern);
+            if (match.Success)
+            {
+                string numberStr = match.Groups[1].Value; // 获取捕获组中的数字字符串
+                float number = float.Parse(numberStr); // 转换为数值类型
+                return number;
+            }
+
+            return float.MaxValue;
+        }
+
         /// <summary>
         /// 排序轨道上的书签
         /// </summary>
@@ -181,6 +196,13 @@ namespace xiaoye97
                 if (!a.IsEmpty && b.IsEmpty)
                 {
                     return -1;
+                }
+                // order比较
+                float orderA = GetOrder(a);
+                float orderB = GetOrder(b);
+                if (orderA != orderB)
+                {
+                    return orderA.CompareTo(orderB);
                 }
                 // Hash比较
                 int hashA = a.GetHashCode();
