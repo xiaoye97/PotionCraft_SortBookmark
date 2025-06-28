@@ -11,6 +11,11 @@ All empty bookmarks will be stacked in the upper left corner.
 
 If you want a bookmark not to participate in sorting, you can start with skip in the medicament description of this bookmark, so that this bookmark will be skipped during sorting.
 
+If you want to customize the order of bookmarks, you can start the description in this bookmark with order:number, so that the bookmarks will be sorted in ascending numerical order.
+
+e.g:
+order:1 order:1.1 order:2 order:3
+
 # Installation Instructions 
 
 1. Download and install [BepInEx_x64_5.4.22][0] from GitHub
@@ -28,6 +33,11 @@ If you want a bookmark not to participate in sorting, you can start with skip in
 所有的空书签会堆叠到左上角。
 
 如果你想让某个书签不参与排序，可以在此书签的药剂描述中以skip开头，这样在排序时就会跳过此书签。
+
+如果你想自定义书签的顺序，可以在此书签的药剂描述以order:number开头，这样书签会以数字的升序排序。
+
+示例:
+order:1 order:1.1 order:2 order:3
 
 # 安装说明
 
