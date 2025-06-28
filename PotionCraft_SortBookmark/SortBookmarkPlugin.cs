@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace xiaoye97
 {
-    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "2.0.2")]
+    [BepInPlugin("me.xiaoye97.plugin.PotionCraft.SortBookmark", "SortBookmark", "2.0.3")]
     public class SortBookmarkPlugin : BaseUnityPlugin
     {
         public static ConfigEntry<KeyCode> Hotkey;

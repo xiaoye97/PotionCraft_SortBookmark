@@ -116,7 +116,7 @@ namespace xiaoye97
                 {
                     var pb = sortPbs[0];
                     var mark = pb.Bookmark;
-                    var markSize = mark.GetBookMarkSize();
+                    var markSize = mark.GetBookmarkSize();
                     // 如果已使用的空间+新的书签的空间大于轨道空间，则切换到下一个轨道
                     if (usedX + markSize.x > rail.size.x)
                     {
