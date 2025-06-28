@@ -1,6 +1,6 @@
 # PotionCraft_SortBookmark
 
-This mod is Compatible with Potion Craft v2.0!
+This mod is Compatible with Potion Craft v2.0.2!
 
 Sort recipe book bookmark.
 
